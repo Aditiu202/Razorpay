@@ -16,7 +16,7 @@ export default function App() {
 
     if (paymentInProgress.current) return;
     paymentInProgress.current = true;
-    const idempotencyKey = crypto.randomUUID();
+    const idempotencyKey = `${Date.now()}-${Math.random().toString(36).substring(2)}`;
     console.log("Generated key:", idempotencyKey);
     console.log("Key length:", idempotencyKey.length);
 
