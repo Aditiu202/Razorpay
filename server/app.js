@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 const app = express();
 const idemptotencyStore = new Map();
 dotenv.config()
-app.use(cors({ origin: "http://localhost:5173" }))
+app.use(cors({ origin: "http://32.236.79.202:8888" }))
 
 
 app.post(
