@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './index.css'
 import { useRef } from "react";
-const backendUrl = "http://32.236.79.202:8080"
+const backendUrl = "http://54.206.139.105:8080"
 
 export default function App() {
   const [loading, setLoading] = useState(false);
