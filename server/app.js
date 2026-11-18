@@ -4,7 +4,7 @@ import cors from 'cors'
 import crypto from 'crypto'
 import dotenv from 'dotenv'
 
-
+const app = express();
 const idemptotencyStore = new Map();
 dotenv.config()
 app.use(cors({
@@ -15,7 +15,7 @@ app.use(cors({
         "Idempotency-Key"
     ]
 }));
-const app = express();
+
 
 app.post(
     "/api/razorpay-webhooks",
