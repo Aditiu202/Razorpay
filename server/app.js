@@ -11,7 +11,7 @@ const idemptotencyStore = new Map();
 dotenv.config()
 app.use(cors({ origin: "http://13.211.205.15:8888" }))
 
-const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/razorpay";
+const mongoUri = process.env.MONGO_URI || "mongodb+srv://aditiu202:aditiu202@cluster0.qvrp8rh.mongodb.net/";
 
 
 app.post(
