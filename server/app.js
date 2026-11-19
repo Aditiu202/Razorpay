@@ -5,13 +5,22 @@ import crypto from 'crypto'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import Payment from './models/Payment.js'
+import dns from "node:dns";
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+dns.promises.resolveSrv(
+    "_mongodb._tcp.cluster0.qvrp8rh.mongodb.net"
+)
+.then(result => console.log("DNS TEST SUCCESS:", result))
+.catch(error => console.log("DNS TEST FAILED:", error));
 
 const app = express();
 const idemptotencyStore = new Map();
 dotenv.config()
 app.use(cors({ origin: "http://13.211.205.15:8888" }))
 
-const mongoUri = process.env.MONGO_URI || "mongodb+srv://aditiu202:aditiu202@cluster0.qvrp8rh.mongodb.net/";
+const mongoUri = process.env.MONGO_URI;
 
 
 app.post(
