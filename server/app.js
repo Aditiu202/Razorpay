@@ -3,18 +3,15 @@ import Razorpay from 'razorpay'
 import cors from 'cors'
 import crypto from 'crypto'
 import dotenv from 'dotenv'
+import mongoose from 'mongoose'
+import Payment from './models/Payment.js'
 
 const app = express();
 const idemptotencyStore = new Map();
 dotenv.config()
-app.use(cors({
-    origin: "http://54.206.139.105:8888",
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: [
-        "Content-Type",
-        "Idempotency-Key"
-    ]
-}));
+app.use(cors({ origin: "http://localhost:5173" }))
+
+const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/razorpay";
 
 
 app.post(
@@ -136,6 +133,16 @@ app.post("/api/order-create", async (req, res) => {
                 }
             })
 
+            await Payment.create({
+                razorpayOrderId: order.id,
+                amount: order.amount,
+                currency: order.currency,
+                receipt: order.receipt,
+                product: order.notes?.product,
+                idempotencyKey,
+                razorpayOrderResponse: order
+            })
+
             console.log("Rzorpay order is created successfully", order.id);
 
             return{
@@ -168,6 +175,11 @@ app.post("/api/order-create", async (req, res) => {
             if (idemptotencyStore.get(idempotencyKey) === orderPromise) {
                 idemptotencyStore.delete(idempotencyKey);
             }
+            return res.status(500).json({
+                success: false,
+                message: "Unable to save payment order",
+                error: error.message
+            });
         }
 
 
@@ -182,7 +194,7 @@ app.post("/api/order-create", async (req, res) => {
     }
 })
 
-app.post("/api/verify-payment", (req, res) => {
+app.post("/api/verify-payment", async (req, res) => {
     try {
         const {
             razorpay_order_id,
@@ -225,32 +237,27 @@ app.post("/api/verify-payment", (req, res) => {
 
 
 
-        const eventId = req.headers['x-razorpay-event-id'];
+        const payment = await Payment.findOneAndUpdate(
+            { razorpayOrderId: razorpay_order_id },
+            {
+                razorpayPaymentId: razorpay_payment_id,
+                razorpaySignature: razorpay_signature,
+                status: "paid"
+            },
+            { new: true }
+        );
 
-        if (!eventId) {
-            return res.status(400).json({
+        if (!payment) {
+            return res.status(404).json({
                 success: false,
-                message: "Missing Razorpay event ID"
+                message: "Payment order not found"
             });
         }
-
-        if (processedWebHookEvent.has(eventId)) {
-            console.log("Duplicate webhook ignored:", eventId);
-            return res.status(200).json({
-                success: true,
-                message: "Webhook event already processed"
-            });
-        }
-
-        const event = JSON.parse(req.body.toString('utf-8'));
-
-        console.log("Verified Razorpay webhook event:", event.event);
-
-        processedWebhookEvents.add(eventId);
 
         return res.status(200).json({
             success: true,
-            message: "Payment signature verified successfully"
+            message: "Payment signature verified and saved successfully",
+            paymentId: payment.razorpayPaymentId
         });
 
     } catch (error) {
@@ -266,6 +273,19 @@ app.post("/api/verify-payment", (req, res) => {
 
 
 
-app.listen(process.env.PORT, () => {
-    console.log("Server is running on this port 8080");
-})
+const startServer = async () => {
+    try {
+        await mongoose.connect(mongoUri);
+        console.log("MongoDB connected successfully");
+
+        const port = process.env.PORT || 8080;
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port}`);
+        });
+    } catch (error) {
+        console.error("MongoDB connection failed:", error.message);
+        process.exit(1);
+    }
+};
+
+startServer();

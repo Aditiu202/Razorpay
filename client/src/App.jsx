@@ -10,10 +10,6 @@ export default function App() {
 
   async function handlepayment() {
 
-
-
-
-
     if (paymentInProgress.current) return;
     paymentInProgress.current = true;
     const idempotencyKey = `${Date.now()}-${Math.random().toString(36).substring(2)}`;
