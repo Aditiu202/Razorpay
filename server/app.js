@@ -9,7 +9,7 @@ import Payment from './models/Payment.js'
 const app = express();
 const idemptotencyStore = new Map();
 dotenv.config()
-app.use(cors({ origin: "http://13.211.205.15:8888/" }))
+app.use(cors({ origin: "http://13.211.205.15:8888" }))
 
 const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/razorpay";
 
