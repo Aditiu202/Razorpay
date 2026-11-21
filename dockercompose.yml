@@ -1,0 +1,58 @@
+services:
+        frontend:
+           build:
+              context: './client'
+              dockerfile: Dockerfile
+           container_name: frontend-conatiner
+           depends_on: 
+                - backend
+           restart: unless-stopped
+           ports:
+               - "8888:80"
+           networks:
+               - mern-network
+        
+        backend:
+            build:
+              context: './server'
+              dockerfile: Dockerfile
+            container_name : backend-container
+            ports:
+                - "8080:8080"
+            environment:
+                RAZORPAY_KEY_SECRET: tDCJ7TjRuB3uWWXEiwPEc92b
+                RAZORPAY_WEBHOOK_SECRET: SOURAVADITI
+                RAZORPAY_KEY: rzp_test_TpGQtMyts3KPwF
+                PORT: 8080
+                MONGO_URI: mongodb+srv://aditiu202:GxHxZLvY2NGFJuBC@cluster0.qvrp8rh.mongodb.net/ 
+
+            depends_on:
+                - mongodb
+            restart: unless-stopped
+            networks:
+                - mern-network
+        
+        mongodb:
+             image: mongo:8
+             container_name: mern-mongodb
+             restart: unless-stopped
+             ports:
+                - "27017:27017"
+             networks: 
+                - mern-network
+             volumes:
+                - mongo-data:/data/db
+
+volumes:
+    mongo-data:
+
+networks:
+    mern-network:
+      driver: bridge
+              
+            
+           
+                 
+                 
+
+       

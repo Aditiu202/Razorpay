@@ -9,11 +9,7 @@ import dns from "node:dns";
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
-dns.promises.resolveSrv(
-    "_mongodb._tcp.cluster0.qvrp8rh.mongodb.net"
-)
-.then(result => console.log("DNS TEST SUCCESS:", result))
-.catch(error => console.log("DNS TEST FAILED:", error));
+
 
 const app = express();
 const idemptotencyStore = new Map();
