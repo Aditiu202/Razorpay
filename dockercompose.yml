@@ -5,12 +5,16 @@ services:
               dockerfile: Dockerfile
            container_name: frontend-conatiner
            depends_on: 
-                - backend
+                backend:
+                  condition: service_healthy
            restart: unless-stopped
            ports:
                - "8888:80"
+           env_file:
+               - './client/.env'
            networks:
                - mern-network
+          
         
         backend:
             build:
@@ -25,7 +29,8 @@ services:
                 RAZORPAY_KEY: rzp_test_TpGQtMyts3KPwF
                 PORT: 8080
                 MONGO_URI: mongodb+srv://aditiu202:GxHxZLvY2NGFJuBC@cluster0.qvrp8rh.mongodb.net/ 
-
+            env_file:
+                - ./server/.env
             depends_on:
                 - mongodb
             restart: unless-stopped
