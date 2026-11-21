@@ -84,12 +84,12 @@ const razorpay = new Razorpay({
 
 
 
-app.get("/", (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "Razorpay pratice server is running"
-    })
-})
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Backend is healthy"
+  });
+});
 
 
 
